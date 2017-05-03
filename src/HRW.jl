@@ -22,6 +22,8 @@ function glpk(f::Vector{Float64}, A::Matrix{Float64}, b::Vector{Float64})
 #function glpk{T}(f::AbstractArray{T,1}, A::AbstractArray{T,2}, b::AbstractArray{T,1})
 #function glpk(f::Array{Float64,1}, A::Array{Float64,2}, b::Array{Float64,1})
 
+	eflag = 0
+
 	n = size(A, 1)
 	m = size(A, 2)
 
@@ -30,7 +32,7 @@ function glpk(f::Vector{Float64}, A::Matrix{Float64}, b::Vector{Float64})
 	GLPK.set_prob_name(lp, "sample")
 	GLPK.set_obj_dir(lp, GLPK.MAX)
 
-	
+
 	GLPK.add_rows(lp, n)
 
 	for i=1:n
@@ -44,19 +46,19 @@ function glpk(f::Vector{Float64}, A::Matrix{Float64}, b::Vector{Float64})
 		GLPK.set_obj_coef(lp, j, f[j])
 	end
 
-	
+
 	GLPK.load_matrix(lp, sparse(A))
 	GLPK.simplex(lp)
 
-	z = glp_get_obj_val(lp)
+	z = GLPK.get_obj_val(lp)
 
 	x = Array(Float64, m)
-	
+
 	for j=1:m
 		x[j] = GLPK.get_col_prim(lp, j)
     end
-	
-	return x, z
+
+	return x, z, eflag
 
 end
 
@@ -69,8 +71,10 @@ end
 # with A[i,:] >= b[i], if ctype[i] == "L"
 function glpk(f::Vector{Float64}, A::Matrix{Float64}, b::Vector{Float64}, lb::Vector{Float64}, ub::Vector{Float64}, ctype::String, vartype::String)
 
-	mip =false
-	
+	eflag = 0
+
+	mip = false
+
 	n = size(A, 1)
 	m = size(A, 2)
 
@@ -121,18 +125,20 @@ function glpk(f::Vector{Float64}, A::Matrix{Float64}, b::Vector{Float64}, lb::Ve
 			GLPK.set_col_kind(lp, j, GLPK.BV)
 		end
 	end
-	
+
 	GLPK.load_matrix(lp, sparse(A))
 	v1 = GLPK.simplex(lp)
 	if v1>0
 		println("*** glpk: No solution found!")
+		eflag = -1
 	end
-	
+
 	if mip==true
 		v2 = GLPK.intopt(lp)
-		
+
 		if v2>0
 			println("*** glpk: No solution found!")
+			eflag = -1
 		end
 	end
 
@@ -144,7 +150,7 @@ function glpk(f::Vector{Float64}, A::Matrix{Float64}, b::Vector{Float64}, lb::Ve
 
 
 	x = Array(Float64, m)
-	
+
 	if mip==true
 		for j=1:m
 			x[j] = GLPK.mip_col_val(lp, j)
@@ -156,7 +162,7 @@ function glpk(f::Vector{Float64}, A::Matrix{Float64}, b::Vector{Float64}, lb::Ve
     end
 
 
-	return x, z
+	return x, z, eflag
 end
 
 
@@ -256,4 +262,3 @@ return t, z
 end
 
 end
-
