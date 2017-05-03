@@ -69,6 +69,10 @@ end
 # with A[i,:] <= b[i], if ctype[i] == "U"
 # with A[i,:] == b[i], if ctype[i] == "S",
 # with A[i,:] >= b[i], if ctype[i] == "L"
+#
+# with x[i] integer,    if vartype[i] == "I"
+# with x[i] continuous, if vartype[i] == "C"
+# with x[i] binary,     if vartype[i] == "B"
 function glpk(f::Vector{Float64}, A::Matrix{Float64}, b::Vector{Float64}, lb::Vector{Float64}, ub::Vector{Float64}, ctype::String, vartype::String)
 
 	eflag = 0
