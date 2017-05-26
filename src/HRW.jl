@@ -1,3 +1,7 @@
+# Autor:        Juergen Vorloeper
+# Organization: Hochschule Ruhr West
+# Date:         Summer 2017
+
 module HRW
 
 
@@ -9,7 +13,7 @@ import GLPK
 
 """
  simple interface to glpk
- solve LP Ax<=b, x>=0, f*x->max
+ solve f*x->max under constraints Ax<=b, x>=0,
  with A \in R^(n\times m), b\in R^n, f,lb,ub \in R^m
 
  #### Fields
@@ -194,7 +198,7 @@ end
 import NLsolve
 
 function solve_dgl(methode::String, fh::Function, z0::Vector{Float64}, tspan::Vector{Float64}, h::Float64)
-# explizite ODE-Loeser
+
 
 const n = round(Int64, (tspan[end]-tspan[1])/h)
 zj = copy(z0)
