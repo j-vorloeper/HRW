@@ -287,7 +287,7 @@ title("Solution of Heat Equation")
 
 ## Project Status
 
-The package is tested against Julia `0.5` on Windows.
+The package is tested against Julia `0.6` on Windows and Linux.
 
 
 ## References
